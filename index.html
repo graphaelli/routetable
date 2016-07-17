@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Route table</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
+    <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.1/leaflet-geocoder-mapzen.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.1/leaflet-geocoder-mapzen.js"></script>
+    <style>
+     .leaflet-pelias-control {
+	 position: fixed;
+	 left: 40%;
+	 top: 80px;
+     }
+     
+     #map {
+	 height: 100%;
+	 width: 100%;
+	 position: absolute;
+     }
+     html,body{margin: 0; padding: 0}
+    </style>
+  </head>
+  <body>
+    <div id="map""></div>
+    <script>
+     var map = L.map('map').setView([39.981173, -75.275333], 13);
+     L.tileLayer('http://{s}.tile.stamen.com/toner/{z}/{x}/{y}.png', {
+	 attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
+	 maxZoom: 18,
+     }).addTo(map);
+     var geocoder_options = {
+	 bounds: L.latLngBounds(L.latLng(39.629909, -75.730557), L.latLng(40.337686, -74.473703)),
+	 expanded: true,
+	 focus: true,
+	 panToPoint: false,
+	 placeholder: 'Where to?',
+     };
+     var geocoder = L.control.geocoder('search-gN5bntm', geocoder_options).addTo(map);
+
+     var popup = L.popup();
+     function onMapClick(e) {
+	 popup
+        .setLatLng(e.latlng)
+        .setContent("You clicked the map at " + e.latlng.toString())
+        .openOn(map);
+     }
+     map.on('click', onMapClick);
+    </script>
+  </body>
+</html>
