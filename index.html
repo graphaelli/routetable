@@ -10,8 +10,18 @@
     <style>
      .rt-leaflet-pelias-control-init {
 	 position: fixed;
-	 left: 30%;
+	 left: 20%;
 	 top: 80px;
+	 width: 600px;
+     }
+
+     .leaflet-pelias-input {
+	 text-align: center;
+	 font-size: 28px;
+     }
+
+    .leaflet-pelias-control.leaflet-pelias-expanded .leaflet-pelias-search-icon {
+	background-image: url('https://mapzen.github.io/leaflet-geocoder/examples/assets/search_blue.png');
      }
 
      #map {
@@ -19,12 +29,17 @@
 	 width: 70%;
 	 position: absolute;
      }
+
+     #rt {
+	 float: right;
+	 width: 30%;
+     }
      html,body{margin: 0; padding: 0}
     </style>
   </head>
   <body>
     <div id="map"></div>
-    <div id="rt"></div>
+    <div id="rt"><ol><li>Search for a destination.</li><li>Click on the map to see the normal weekday schedule from there.</li></ol></div>
     <script>
       src = null;
       dst = null;
@@ -33,7 +48,7 @@
 	 if (src && dst) {
 	     console.log('fetching route table between ', src, dst);
 	     var rt = document.getElementById('rt');
-	     rt.innerHTML = 'fetching routes to ' + dst.feature.properties.label;
+	     rt.innerHTML = '<p>Fetching routes to ' + dst.feature.properties.label + '</p>';
              var xhr = new XMLHttpRequest();
              xhr.open('GET', 'http://localhost:5000/rt/' + src.latlng.lat + ',' + src.latlng.lng + ';'  + dst.latlng.lat + ',' + dst.latlng.lng);
              xhr.send(null);
@@ -45,11 +60,27 @@
 		 switch(xhr.readyState) {
 		     case HEADERS_RECEIVED:
 		     case LOADING:
-			 rt.innerHTML = '<p>loading routes to ' + dst.feature.properties.label + '</p>';
+			 rt.innerHTML = '<p>Loading trips to ' + dst.feature.properties.label + '</p>';
 			 break;
 		     case DONE:
 			 if (xhr.status === OK) {
-			     rt.innerHTML = xhr.responseText;
+			     trips = JSON.parse(xhr.responseText);
+			     if (trips.length == 0) {
+				 rt.innerHTML = '<p>No trips to ' + dst.feature.properties.label + ' from that spot found.</p>';
+			     } else {
+				 route_table_html = '<table><thead><tr><td colspan="4">Trips to ' + dst.feature.properties.label + '</td></tr></thead><tbody><tr><th>Depart</th><th>Route</th><th>Stop</th><th>Stop distance</th></tr>';
+				 for (var i = 0; i < trips.length; i++) {
+				     trip = trips[i];
+				     route_table_html += '<tr>';
+				     route_table_html += '<td>' + trip.departure_time + '</td>';
+				     route_table_html += '<td>' + trip.route_short_name + '</td>';
+				     route_table_html += '<td>' + trip.begin_stop_name + '</td>';
+				     route_table_html += '<td>' + trip.begin_distance + '</td>';
+				     route_table_html += '</tr>';
+				 }
+				 route_table_html += '</tbody></table>';
+				 rt.innerHTML = route_table_html;
+			     }
 			 } else {
 			     rt.innerHTML = '<p>error!</p>';
 			     console.log(xhr.responseText);
