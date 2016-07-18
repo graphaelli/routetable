@@ -44,8 +44,9 @@
       src = null;
       dst = null;
 
-     function getRouteTable() {
+     function getRouteTable(map) {
 	 if (src && dst) {
+	     map.fitBounds([src.latlng, dst.latlng])
 	     console.log('fetching route table between ', src, dst);
 	     var rt = document.getElementById('rt');
 	     rt.innerHTML = '<p>Fetching routes to ' + dst.feature.properties.label + '</p>';
@@ -109,7 +110,7 @@
      geocoder.on('select', function (e) {
 	 dst = e;
          console.log('Destination set:', e);
-	 getRouteTable();
+	 getRouteTable(map);
 
 	 geocoder.getContainer().classList.remove('rt-leaflet-pelias-control-init');
 	 geocoder.collapse();
@@ -122,7 +123,7 @@
         .setContent("Trip start set to " + e.latlng.toString())
         .openOn(map);
 	src = e;
-        getRouteTable();
+        getRouteTable(map);
      };
      map.on('click', onMapClick);
     </script>
