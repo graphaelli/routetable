@@ -2,6 +2,8 @@ import json
 import flask
 import psycopg2
 
+from crossdomain import crossdomain
+
 
 app = flask.Flask(__name__)
 
@@ -44,7 +46,7 @@ QUERY_RT = """
           ON times_end.stop_id = stops_end.stop_id
         JOIN calendar
           ON trips_begin.service_id = calendar.service_id
-        WHERE times_end.stop_id IN (SELECT stop_id FROM stops_end_choices)        
+        WHERE times_end.stop_id IN (SELECT stop_id FROM stops_end_choices)
         AND times_begin.departure_time < times_end.arrival_time
         AND times_begin.departure_time BETWEEN '07:30:00' AND '10:30:00'
         AND calendar.monday
@@ -56,7 +58,8 @@ QUERY_RT = """
     """
 
 
-@app.route('/rt/<src_lat>,<src_lon>;<dst_lat>,<dst_lon>')
+@app.route('/rt/<src_lat>,<src_lon>;<dst_lat>,<dst_lon>', methods=['GET', 'OPTIONS'])
+@crossdomain(origin='*')
 def route_table(src_lat, src_lon, dst_lat, dst_lon):
     conn = psycopg2.connect('postgres://localhost')
     cursor = conn.cursor()    
