@@ -1,11 +1,17 @@
+import os
+
 import flask
 import psycopg2
 import psycopg2.extras
 
 from crossdomain import crossdomain
-
+import db
 
 app = flask.Flask(__name__)
+
+
+db.initialize(os.getenv('DATABASE_URL', 'postgres://localhost'))
+
 
 QUERY_RT = """
     WITH stops_begin AS (
@@ -60,10 +66,9 @@ QUERY_RT = """
 @app.route('/rt/<src_lat>,<src_lon>;<dst_lat>,<dst_lon>', methods=['GET', 'OPTIONS'])
 @crossdomain(origin='*')
 def route_table(src_lat, src_lon, dst_lat, dst_lon):
-    conn = psycopg2.connect('postgres://localhost')
-    cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-    cursor.execute(QUERY_RT, {
-        'start_lat': src_lat, 'start_lon': src_lon,
-        'end_lat': dst_lat, 'end_lon': dst_lon
-    })
-    return flask.jsonify(cursor.fetchall())
+    with db.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
+        cursor.execute(QUERY_RT, {
+            'start_lat': src_lat, 'start_lon': src_lon,
+            'end_lat': dst_lat, 'end_lon': dst_lon
+        })
+        return flask.jsonify(cursor.fetchall())
