@@ -30,7 +30,7 @@
 	 position: absolute;
      }
 
-     #rt {
+     #side {
 	 float: right;
 	 width: 30%;
      }
@@ -39,7 +39,10 @@
   </head>
   <body>
     <div id="map"></div>
-    <div id="rt"><ol><li>Search for a destination.</li><li>Click on the map to see the normal weekday schedule from there.</li></ol></div>
+    <div id="side">
+      <div id="rt"><ol><li>Search for a destination.</li><li>Click on the map to see the normal weekday schedule from there.</li></ol></div>
+      <div id="help"></div>
+    </div>
     <script>
       src = null;
       dst = null;
@@ -92,6 +95,15 @@
 	 }
      }
 
+     function setDestination(o) {
+         dst = o;
+         console.log('Destination set:', o);
+	 getRouteTable(map);
+
+	 geocoder.getContainer().classList.remove('rt-leaflet-pelias-control-init');
+	 geocoder.collapse();
+     }
+
      var map = L.map('map').setView([39.981173, -75.275333], 13);
      L.tileLayer('http://{s}.tile.stamen.com/toner/{z}/{x}/{y}.png', {
 	 attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
@@ -99,6 +111,7 @@
       }).addTo(map);
 
      var geocoder_options = {
+	 // not supported by automplete
 	 bounds: L.latLngBounds(L.latLng(39.629909, -75.730557), L.latLng(40.337686, -74.473703)),
 	 expanded: true,
 	 focus: true,
@@ -108,12 +121,7 @@
      var geocoder = L.control.geocoder('search-gN5bntm', geocoder_options).addTo(map);
      geocoder.getContainer().classList.add('rt-leaflet-pelias-control-init');
      geocoder.on('select', function (e) {
-	 dst = e;
-         console.log('Destination set:', e);
-	 getRouteTable(map);
-
-	 geocoder.getContainer().classList.remove('rt-leaflet-pelias-control-init');
-	 geocoder.collapse();
+         setDestination(e);
      });
 
      var popup = L.popup();
