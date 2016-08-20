@@ -45,6 +45,7 @@
     </div>
     <script>
      src = null;
+     srcPin = L.marker([0,0]);
      dst = null;
 
      function getRouteTable(map) {
@@ -104,6 +105,16 @@
 	 geocoder.collapse();
      }
 
+     function setSource(o) {
+	 src = o;
+	 console.log('Source set:', o);
+
+	 srcPin.setLatLng(o.latlng);
+	 srcPin.addTo(map)
+	       .bindPopup("Trip start set to " + o.latlng.toString())
+	       .openPopup();
+	 getRouteTable(map);
+     }
      var map = L.map('map').setView([39.981173, -75.275333], 13);
      L.tileLayer('http://{s}.tile.stamen.com/toner/{z}/{x}/{y}.png', {
 	 attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
@@ -124,14 +135,8 @@
 	 setDestination(e);
      });
 
-     var popup = L.popup();
      function onMapClick(e) {
-	 popup
-	.setLatLng(e.latlng)
-	.setContent("Trip start set to " + e.latlng.toString())
-	.openOn(map);
-	 src = e;
-	 getRouteTable(map);
+	 setSource(e);
      };
      map.on('click', onMapClick);
     </script>
