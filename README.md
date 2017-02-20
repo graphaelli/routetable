@@ -1,7 +1,5 @@
 # Custom Trip Timetables
 
-http://g.raphaelli.com/rt/
-
 ## Load GTFS Feed
 
 First, you'll need a GTFS feed.  For Philly, grab SEPTA's at http://www3.septa.org/developer/.
